@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dự đoán giá tiền xe ôm</title>
+    <!-- Thêm Bootstrap CSS từ CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Dự đoán giá tiền xe ôm</h1>
+        <div class="row">
+            <div class="col-md-4">
+                <img src="{{ url_for('static', filename='img/grab.jpg') }}" alt="Grab" class="img-fluid">
+            </div>
+            <div class="col-md-4">
+                <img src="{{ url_for('static', filename='img/be.jpg') }}" alt="Be" class="img-fluid">
+            </div>
+            <div class="col-md-4">
+                <img src="{{ url_for('static', filename='img/go.jpg') }}" alt="Gojek" class="img-fluid">
+            </div>
+        </div>
+        
+        <form action="/" method="post" class="mt-4">
+            <div class="form-group">
+                <label for="origin_address">Điểm đón:</label>
+                <input type="text" id="origin_address" name="origin_address" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="destination_address">Điểm đến:</label>
+                <input type="text" id="destination_address" name="destination_address" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="central_area">Vùng trung tâm:</label>
+                <select id="central_area" name="central_area" class="form-control" required>
+                    <option value="1">Trung Tâm Thành Phố</option>
+                    <option value="2">Xung Quanh Thành Phố</option>
+                    <option value="3">Ngoại Thành</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="running_time">Thời gian đặt xe:</label>
+                <input type="number" id="running_time" name="running_time" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Dự đoán</button>
+        </form>
+        
+        {% if show_result %}
+            <div class="mt-4">
+                <h2>Số tiền có thể phải trả:</h2>
+                <p><span style="font-size: 1.5em; font-weight: bold;">{{ predicted_fare }} VNĐ</span></p>            
+            </div>
+        {% endif %}
+
+        {% if show_error %}
+            <div class="mt-4 alert alert-danger">
+                <h4>Error:</h4>
+                <p>There was an error fetching data or geocoding addresses.</p>
+            </div>
+        {% endif %}
+    </div>
+    <!-- Thêm Bootstrap JS và Popper.js từ CDN -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Preserve form data on page refresh
+        document.addEventListener('DOMContentLoaded', function() {
+            const predictionForm = document.getElementById('predictionForm');
+            predictionForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(predictionForm);
+                fetch('/', {
+                    method: 'POST',
+                    body: formData,
+                }).then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    }
+                });
+            });
+
+            const resultSection = document.getElementById('result');
+            if (resultSection) {
+                resultSection.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
